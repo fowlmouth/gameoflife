@@ -13,7 +13,7 @@ bool GameOfLife::at(std::size_t x, std::size_t y)
 
 bool GameOfLife::at_checked(std::size_t x, std::size_t y, bool oob_value) const
 {
-  if(x >= 0 && y >= 0 && x < width_ && y < height_)
+  if(x < width_ && y < height_)
   {
     return cells_[y * width_ + x];
   }

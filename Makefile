@@ -12,7 +12,7 @@ ALL: $(BIN)
 $(BIN): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-debug: CXXFLAGS += -g -DDEBUG
+debug: CXXFLAGS += -g -DDEBUG -fsanitize=address -fno-omit-frame-pointer
 debug: $(BIN)
 
 release: CXXFLAGS += -O2 -DNDEBUG -DRELEASE
@@ -20,7 +20,5 @@ release: $(BIN)
 
 clean:
 	$(RM) $(OBJ)
-
 cleanall: clean
 	$(RM) $(BIN)
-
