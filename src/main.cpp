@@ -2,6 +2,7 @@
 #include "cli.h"
 
 #include <random>
+#include <iostream>
 
 void tb_write(int x, int y, const char *str, uint16_t fg, uint16_t bg)
 {
@@ -21,7 +22,12 @@ int main(int argc, const char** argv)
       height = std::stoi(std::string(arg));
     }).parse(argc, argv);
 
-  tb_init();
+  if(tb_init())
+  {
+    std::cerr << "Failed to initialize termbox" << std::endl;
+    return 2;
+  }
+
   tb_clear();
   tb_write(0, 0, "Loading", TB_WHITE, TB_BLACK);
   tb_present();
@@ -104,6 +110,7 @@ int main(int argc, const char** argv)
       tb_present();
     }
   }
+
   tb_shutdown();
   return 0;
 }
