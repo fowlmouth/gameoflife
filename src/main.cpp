@@ -14,12 +14,15 @@ void tb_write(int x, int y, const char *str, uint16_t fg, uint16_t bg)
 
 int main(int argc, const char** argv)
 {
-  int width = 1000, height = 1000;
+  int width = -1, height = -1;
+  int update_time = 250;
   CLI{}
     .on("--width", [&](std::string_view arg) {
       width = std::stoi(std::string(arg));
     }).on("--height", [&](std::string_view arg) {
       height = std::stoi(std::string(arg));
+    }).on("--update-time", [&](std::string_view arg) {
+      update_time = std::stoi(std::string(arg));
     }).parse(argc, argv);
 
   if(tb_init())
@@ -27,6 +30,11 @@ int main(int argc, const char** argv)
     std::cerr << "Failed to initialize termbox" << std::endl;
     return 2;
   }
+
+  if(width == -1)
+    width = tb_width();
+  if(height == -1)
+    height = tb_height();
 
   tb_clear();
   tb_write(0, 0, "Loading", TB_WHITE, TB_BLACK);
@@ -49,7 +57,7 @@ int main(int argc, const char** argv)
 
   while(running)
   {
-    switch(tb_peek_event(&event, 50))
+    switch(tb_peek_event(&event, update_time))
     {
     case 0:
       // peek timeout
