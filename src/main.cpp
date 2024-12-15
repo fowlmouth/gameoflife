@@ -6,7 +6,7 @@
 
 void tb_write(int x, int y, const char *str, uint16_t fg, uint16_t bg)
 {
-  for (int i = 0; str[i] != '\0'; ++i)
+  for(int i = 0; str[i]; ++i)
   {
     tb_change_cell(x + i, y, str[i], fg, bg);
   }
@@ -23,6 +23,18 @@ int main(int argc, const char** argv)
       height = std::stoi(std::string(arg));
     }).on("--update-time", [&](std::string_view arg) {
       update_time = std::stoi(std::string(arg));
+    }).on("--help", []() {
+      std::cout << "Usage: gol [options]\n"
+        "Options:\n"
+        "  --width <width>         Set the width of the field\n"
+        "  --height <height>       Set the height of the field\n"
+        "  --update-time <time>    Set the update time in ms\n"
+        "  --help                  Print this message\n\n"
+        "Controls:\n"
+        "  l: toggle legend\n"
+        "  a: toggle auto-update\n"
+        "  r: randomize the game field\n";
+      exit(0);
     }).parse(argc, argv);
 
   if(tb_init())
@@ -50,7 +62,8 @@ int main(int argc, const char** argv)
   tb_event event;
   // int offset_y = 0;
   bool running = true;
-  bool auto_update = true;
+  bool auto_update = true,
+    show_legend = false;
   bool render_ready = true,
     update_ready = false;
   std::string top_message;
@@ -83,8 +96,15 @@ int main(int argc, const char** argv)
         // no special key, normal input
         switch(event.ch)
         {
+        case 'l':
+          show_legend = !show_legend;
+          render_ready = true;
+          break;
         case 'r':
           randomize_ready = true;
+          break;
+        case 'a':
+          auto_update = !auto_update;
           break;
         default:
           break;
@@ -114,7 +134,13 @@ int main(int argc, const char** argv)
       render_ready = false;
       tb_clear();
       tb_write(0, 0, top_message.c_str(), TB_WHITE, TB_BLACK);
-      field.tb_render(0, 0, tb_width(), tb_height());
+      int offset_y = 0;
+      if(show_legend)
+      {
+        offset_y = 1;
+        tb_write(0, 0, "l: toggle legend, a: toggle auto-update, r: randomize, space: update step, esc: quit", TB_WHITE, TB_BLACK);
+      }
+      field.tb_render(0, offset_y, tb_width(), tb_height());
       tb_present();
     }
   }
