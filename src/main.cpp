@@ -66,7 +66,6 @@ int main(int argc, const char** argv)
     show_legend = false;
   bool render_ready = true,
     update_ready = false;
-  std::string top_message;
 
   while(running)
   {
@@ -133,7 +132,6 @@ int main(int argc, const char** argv)
     {
       render_ready = false;
       tb_clear();
-      tb_write(0, 0, top_message.c_str(), TB_WHITE, TB_BLACK);
       int offset_y = 0;
       if(show_legend)
       {
