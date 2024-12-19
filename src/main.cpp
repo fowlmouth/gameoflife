@@ -1,6 +1,7 @@
 #include "gol.h"
 #include "cli.h"
 
+#include <chrono>
 #include <random>
 #include <iostream>
 
@@ -15,7 +16,7 @@ void tb_write(int x, int y, const char *str, uint16_t fg, uint16_t bg)
 int main(int argc, const char** argv)
 {
   int width = -1, height = -1;
-  int update_time = 250;
+  int update_time = 250, reset_time = -1;
   CLI{}
     .on("--width", [&](std::string_view arg) {
       width = std::stoi(std::string(arg));
@@ -23,17 +24,21 @@ int main(int argc, const char** argv)
       height = std::stoi(std::string(arg));
     }).on("--update-time", [&](std::string_view arg) {
       update_time = std::stoi(std::string(arg));
+    }).on("--reset-time", [&](std::string_view arg) {
+      reset_time = std::stoi(std::string(arg));
     }).on("--help", []() {
       std::cout << "Usage: gol [options]\n"
         "Options:\n"
-        "  --width <width>         Set the width of the field\n"
-        "  --height <height>       Set the height of the field\n"
-        "  --update-time <time>    Set the update time in ms\n"
-        "  --help                  Print this message\n\n"
+        "  --width <integer>         Set the width of the field\n"
+        "  --height <integer>        Set the height of the field\n"
+        "  --update-time <integer>   Set the update time in milliseconds\n"
+        "  --reset-time <integer>    Set the reset time in milliseconds\n"
+        "  --help                    Print this message\n\n"
         "Controls:\n"
         "  l: toggle legend\n"
         "  a: toggle auto-update\n"
-        "  r: randomize the game field\n";
+        "  r: randomize the game field\n"
+        "  space: step the simulation\n";
       exit(0);
     }).parse(argc, argv);
 
@@ -66,6 +71,7 @@ int main(int argc, const char** argv)
     show_legend = false;
   bool render_ready = true,
     update_ready = false;
+  std::chrono::time_point<std::chrono::system_clock> last_reset;
 
   while(running)
   {
@@ -111,6 +117,12 @@ int main(int argc, const char** argv)
         break;
       }
       break;
+    }
+
+    if(reset_time > -1 && std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last_reset).count() > (long long)reset_time)
+    {
+      randomize_ready = true;
+      last_reset = std::chrono::system_clock::now();
     }
 
     if(randomize_ready)
