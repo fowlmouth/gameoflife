@@ -17,6 +17,7 @@ int main(int argc, const char** argv)
 {
   int width = -1, height = -1;
   int update_time = 250, reset_time = -1;
+  std::optional<int> render_character;
   CLI{}
     .on("--width", [&](std::string_view arg) {
       width = std::stoi(std::string(arg));
@@ -26,6 +27,8 @@ int main(int argc, const char** argv)
       update_time = std::stoi(std::string(arg));
     }).on("--reset-time", [&](std::string_view arg) {
       reset_time = std::stoi(std::string(arg));
+    }).on("--render-character", [&](std::string_view arg) {
+      render_character = arg[0];
     }).on("--help", []() {
       std::cout << "Usage: gol [options]\n"
         "Options:\n"
@@ -33,6 +36,7 @@ int main(int argc, const char** argv)
         "  --height <integer>        Set the height of the field\n"
         "  --update-time <integer>   Set the update time in milliseconds\n"
         "  --reset-time <integer>    Set the reset time in milliseconds\n"
+        "  --render-char <char>      Set the render character (default null)\n"
         "  --help                    Print this message\n\n"
         "Controls:\n"
         "  l: toggle legend\n"
@@ -150,7 +154,7 @@ int main(int argc, const char** argv)
         offset_y = 1;
         tb_write(0, 0, "l: toggle legend, a: toggle auto-update, r: randomize, space: update step, esc: quit", TB_WHITE, TB_BLACK);
       }
-      field.tb_render(0, offset_y, tb_width(), tb_height());
+      field.tb_render(0, offset_y, tb_width(), tb_height(), render_character);
       tb_present();
     }
   }

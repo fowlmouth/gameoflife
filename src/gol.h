@@ -1,6 +1,7 @@
 #include "termbox.h"
 
 #include <vector>
+#include <optional>
 #include <algorithm>
 #include <functional>
 
@@ -23,5 +24,5 @@ public:
   void reset(std::function< bool(int x, int y) > callback);
 
   void update();
-  void tb_render(int offset_x, int offset_y, int width, int height);
+  void tb_render(int offset_x, int offset_y, int width, int height, std::optional< int > render_character);
 };

@@ -72,16 +72,35 @@ void GameOfLife::update()
   cells_.swap(cells_buffer_);
 }
 
-void GameOfLife::tb_render(int offset_x, int offset_y, int width, int height)
+void GameOfLife::tb_render(int offset_x, int offset_y, int width, int height, std::optional< int > render_character)
 {
   int max_y = std::min((std::size_t)height, height_);
   int max_x = std::min((std::size_t)width, width_);
-  for(int y = 0; y < max_y; ++y)
+  if(render_character)
   {
-    for(int x = 0; x < max_x; ++x)
+    for(int y = 0; y < max_y; ++y)
     {
-      tb_change_cell(offset_x + x, offset_y + y,
-        at(x, y) ? '#' : ' ', TB_WHITE, TB_BLACK);
+      for(int x = 0; x < max_x; ++x)
+      {
+        tb_change_cell(offset_x + x, offset_y + y,
+          at(x, y) ? *render_character : ' ',
+          TB_WHITE, TB_BLACK);
+      }
+    }
+  }
+  else
+  {
+    for(int y = 0; y < max_y; ++y)
+    {
+      for(int x = 0; x < max_x; ++x)
+      {
+        if(at(x, y))
+          tb_change_cell(offset_x + x, offset_y + y, ' ',
+            TB_BLACK, TB_WHITE);
+        else
+          tb_change_cell(offset_x + x, offset_y + y, ' ',
+            TB_WHITE, TB_BLACK);
+      }
     }
   }
 }
